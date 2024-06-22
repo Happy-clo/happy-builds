@@ -1,16 +1,26 @@
+# 定义工作流的名称，表明这是一个自动构建流程
 name: (CI) Automatic Build
 
+# 定义触发工作流的事件，包括手动触发和定时触发
 on:
+  # 允许通过界面手动触发工作流
   workflow_dispatch: {}
+  # 定时触发，每10分钟执行一次
   schedule:
-  - cron: '*/10 * * * *'
+    - cron: "*/10 * * * *"
 
+# 定义工作流中的任务
 jobs:
+  # 定义一个名为build的任务
   build:
+    # 任务的名称，表明这是一个自动构建任务
     name: Automatic Build
+    # 指定任务在哪个环境下运行，这里选择最新的Ubuntu版本
     runs-on: ubuntu-latest
 
+    # 定义任务中的环境变量
     env:
+      # 以下是一些用于构建的密钥和配置信息，通过GitHub Secrets进行安全存储和使用
       BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
       R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
       R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
@@ -20,28 +30,35 @@ jobs:
       WEBHOOK_KEY: ${{ secrets.WEBHOOK_KEY }}
       NODE_ENV: production
 
+    # 定义任务的步骤
     steps:
-    - name: Checking out Repository
-      uses: actions/checkout@v4
+      # 检出代码仓库
+      - name: Checking out Repository
+        uses: actions/checkout@v4
 
-    - name: Setting up Java
-      uses: actions/setup-java@v4
-      with:
-        distribution: 'zulu'
-        java-version: '21'
+      # 设置Java开发环境
+      - name: Setting up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: "zulu"
+          java-version: "21"
 
-    - name: Setting up node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '20.3.0'
+      # 设置node.js开发环境
+      - name: Setting up node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20.3.0"
 
-    - name: Setting up bun
-      uses: oven-sh/setup-bun@v1
+      # 设置bun开发环境
+      - name: Setting up bun
+        uses: oven-sh/setup-bun@v1
 
-    - name: Installing dependencies
-      run: bun install
-      working-directory: ci
+      # 安装依赖库
+      - name: Installing dependencies
+        run: bun install
+        working-directory: ci
 
-    - name: Run automatic build
-      run: bun run start
-      working-directory: ci
+      # 执行自动构建命令
+      - name: Run automatic build
+        run: bun run start
+        working-directory: ci

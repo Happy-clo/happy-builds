@@ -1,33 +1,43 @@
+# 工作流名称，此处命名为API部署工作流
 name: (API) Deploy API
 
+# 触发条件，包括当推送到master分支且api目录下有文件变更时，以及手动触发
 on:
   push:
     branches:
       - master
     paths:
-      - 'api/**'
+      - "api/**"
   workflow_dispatch:
 
+# 定义工作流中的任务
 jobs:
+  # 任务名称为deploy，用于部署API
   deploy:
+    # 任务在ubuntu-latest环境下运行
     runs-on: ubuntu-latest
     name: Deploy
     steps:
+      # 检出代码仓库
       - name: Checking out Repository
         uses: actions/checkout@v4
 
+      # 设置node.js环境，使用版本20.3.0
       - name: Setting up node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20.3.0'
+          node-version: "20.3.0"
 
+      # 设置bun环境
       - name: Setting up bun
         uses: oven-sh/setup-bun@v1
 
+      # 在api目录下安装依赖
       - name: Installing dependencies
         run: bun install
         working-directory: api
 
+      # 使用cloudflare/wrangler-action进行部署，环境为production
       - name: Deploy
         uses: cloudflare/wrangler-action@v3
         with:

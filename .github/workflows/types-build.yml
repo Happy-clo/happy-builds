@@ -1,36 +1,54 @@
+# 工作流名称，标识这个工作流的目的。
 name: (Types) Build
+
+# 触发工作流的事件，这里配置为在pull request时触发。
 on:
   pull_request:
+    # 限定pull request的目标分支为master。
     branches:
       - master
+    # 限定工作流只在types目录有改动时触发。
     paths:
-      - 'types/**'
+      - "types/**"
+
+# 定义工作流中的任务。
 jobs:
+  # 唯一的任务名称为build。
   build:
+    # 任务的描述。
     name: Build, lint, and test on Node ${{ matrix.node }} and ${{ matrix.os }}
 
+    # 指定任务运行的环境。
     runs-on: ${{ matrix.os }}
+
+    # 使用策略矩阵来并行运行多个版本的Node.js和操作系统。
     strategy:
       matrix:
-        node: ['18.x', '20.x']
+        node: ["18.x", "20.x"]
         os: [ubuntu-latest]
 
+    # 任务包含的步骤。
     steps:
+      # 检出代码仓库。
       - name: Checkout repo
         uses: actions/checkout@v4
 
+      # 设置Node.js运行环境。
       - name: Use Node ${{ matrix.node }}
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node }}
 
+      # 设置bun运行环境。
       - name: Setting up bun
         uses: oven-sh/setup-bun@v1
 
+      # 安装types目录下的依赖。
       - name: Installing dependencies
         run: bun install
         working-directory: types
 
+      # 在types目录下执行构建命令。
       - name: Run build
         run: bun run build
         working-directory: types
